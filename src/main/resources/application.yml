@@ -1,0 +1,97 @@
+spring:
+  application:
+    name: aurora-failover
+  main:
+    banner-mode: "off"
+  profiles:
+    active: localhost
+  jackson:
+    default-property-inclusion: non_empty
+  datasource:
+    username: dinnertime
+    password: password
+    hikari:
+      schema: dinnertime
+  flyway:
+    schemas:
+      - ${spring.datasource.hikari.schema}
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 50
+        temp:
+          use_jdbc_metadata_defaults: false
+    show-sql: false
+
+logging:
+  level:
+    io.micrometer.newrelic: WARN
+
+resource:
+  path: /v1/dinner
+
+# Actuator Settings
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+  metrics:
+    export:
+      newrelic:
+        enabled: false
+        connect-timeout: 10s
+    tags:
+      application: ${spring.application.name}
+      container: ${HOSTNAME:}${COMPUTERNAME:}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: localhost
+  datasource-reader:
+    driver-class-name: org.postgresql.Driver
+    jdbc-url: jdbc:postgresql://localhost:5433/postgres
+    platform: postgresql
+    username: postgres
+    password: password
+    hikari:
+      schema: postgres
+      maximum-pool-size: 10
+      minimum-idle: 1
+      idle-timeout: 10000
+      pool-name: ReadHikariPool
+  datasource-writer:
+    driver-class-name: org.postgresql.Driver
+    jdbc-url: jdbc:postgresql://localhost:5432/postgres
+    platform: postgresql
+    username: postgres
+    password: password
+    hikari:
+      schema: postgres
+      maximum-pool-size: 10
+      minimum-idle: 1
+      idle-timeout: 10000
+      pool-name: WriteHikariPool
+
+  flyway:
+    placeholders:
+      username: ${spring.datasource.username}
+      password: ${spring.datasource.password}
+    user: postgres
+    password: password
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    example: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
