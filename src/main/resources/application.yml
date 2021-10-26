@@ -93,5 +93,59 @@ spring:
 logging:
   level:
     example: DEBUG
+    com.zaxxer.hikari: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
+
+---
+spring:
+  config:
+    activate:
+      on-profile: development
+  datasource:
+    username: dinnertime
+    password: password
+# Reader and writer datasource configuration from https://dzone.com/articles/spring-boot-2-with-multiple-datasources
+  datasource-reader:
+    driver-class-name: software.aws.rds.jdbc.postgresql.Driver
+    jdbc-url: jdbc:postgresql://database-2.cluster-ro-****.ap-southeast-2.rds.amazonaws.com:5432/postgres
+    platform: postgresql
+    username: postgres
+    password: ****
+    schema: postgres
+    maximum-pool-size: 10
+    minimum-idle: 1
+    idle-timeout: 10000
+    max-lifetime: 30000
+    pool-name: ReadHikariPool
+    connection-test-query: SELECT 1
+  datasource-writer:
+    driver-class-name: software.aws.rds.jdbc.postgresql.Driver
+    jdbc-url: jdbc:postgresql://database-2.cluster-****.ap-southeast-2.rds.amazonaws.com:5432/postgres
+    platform: postgresql
+    username: postgres
+    password: ****
+    schema: postgres
+    maximum-pool-size: 10
+    minimum-idle: 1
+    idle-timeout: 10000 # This is the minimum supported idle timeout
+    max-lifetime: 30000 # This is the minimum supported idle timeout
+    pool-name: WriteHikariPool
+    # https://groups.google.com/g/hikari-cp/c/VH7nqwGimCs?pli=1
+    connection-test-query: SET TRANSACTION READ WRITE
+    connection-init-sql: SET TRANSACTION READ WRITE
+
+  flyway:
+    placeholders:
+      username: ${spring.datasource.username}
+      password: ${spring.datasource.password}
+    user: postgres
+    password: ****
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    example: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
