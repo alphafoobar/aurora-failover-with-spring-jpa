@@ -23,7 +23,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.flywaydb:flyway-core'
-	runtimeOnly 'org.postgresql:postgresql'
+	// https://github.com/awslabs/aws-postgresql-jdbc
+	runtimeOnly 'software.aws.rds:aws-postgresql-jdbc:0.1.0'
 	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
 	implementation 'org.projectlombok:lombok:1.18.22'
 	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
