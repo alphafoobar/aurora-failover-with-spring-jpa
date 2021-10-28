@@ -1,7 +1,6 @@
 package example.db;
 
 import example.api.MealDto;
-import example.db.read.MealRepositoryRead;
 import example.db.write.MealRepositoryWrite;
 import example.mapper.MealMapper;
 import org.springframework.stereotype.Service;
@@ -12,27 +11,25 @@ import java.util.UUID;
 
 @Service
 public class MealService {
-    private final MealRepositoryRead reader;
-    private final MealRepositoryWrite writer;
+    private final MealRepositoryWrite repository;
 
-    public MealService(MealRepositoryRead reader, MealRepositoryWrite writer) {
-        this.reader = reader;
-        this.writer = writer;
+    public MealService(MealRepositoryWrite repository) {
+        this.repository = repository;
     }
 
     public MealDto find() {
-        return MealMapper.INSTANCE.map(reader.findAll().iterator().next());
+        return MealMapper.INSTANCE.map(repository.findAll().iterator().next());
     }
 
     public MealDto findById(UUID id) {
-        return MealMapper.INSTANCE.map(reader.findById(id).orElseThrow());
+        return MealMapper.INSTANCE.map(repository.findById(id).orElseThrow());
     }
 
     public MealDto create(MealDto request) {
         MealDto dto = request.withId(UUID.randomUUID())
                 .withCreated(ZonedDateTime.now(ZoneId.of("UTC")));
 
-        writer.save(MealMapper.INSTANCE.map(dto));
+        repository.save(MealMapper.INSTANCE.map(dto));
         return dto;
     }
 }
